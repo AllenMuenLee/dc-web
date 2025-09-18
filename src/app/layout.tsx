@@ -7,6 +7,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Dream Crown",
   description: "Allen Lee's business website",
+  icons: {
+    icon: '/imgs/logo.png',
+  },
 };
 
 export default function RootLayout({
