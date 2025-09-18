@@ -17,11 +17,39 @@ interface CardData {
   createdAt: number;
 }
 
+import IntroSection from '../components/IntroSection';
+
 export default function Home() {
   const [cards, setCards] = useState<CardData[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
   const [numberOfHighlights, setNumberOfHighlights] = useState(1);
+  const [isNavVisible, setIsNavVisible] = useState(false);
+  const [isScrollButtonVisible, setIsScrollButtonVisible] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const introSection = document.getElementById('intro');
+
+      // Nav visibility
+      
+      if (currentScrollY > 80) {
+        console.log('Scroll Y:', currentScrollY);
+        setIsNavVisible(true);
+        setIsScrollButtonVisible(false);
+      } else {
+        setIsNavVisible(false);
+        setIsScrollButtonVisible(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     fetchCards();
@@ -54,6 +82,11 @@ export default function Home() {
     setSelectedCard(null);
   };
 
+  const handleScrollButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    document.getElementById('about-me')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const allSortedCards = [...cards].sort((a, b) => b.createdAt - a.createdAt);
   const highlightCards = allSortedCards.slice(0, numberOfHighlights);
 
@@ -69,13 +102,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-md fixed w-full z-10">
+      <header className={`bg-white shadow-md fixed w-full z-10 transition-transform duration-300 ease-in-out ${!isNavVisible ? '-translate-y-full' : ''}`}>
         <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
           <div className="text-2xl font-bold text-gray-800">
             {/* Blue banner is the logo */}
           </div>
           <div className="flex space-x-4">
             <a href="#intro" className="text-gray-800 hover:text-blue-600">Homepage</a>
+            <a href="#about-me" className="text-gray-800 hover:text-blue-600">About Me</a>
             <a href="#highlight" className="text-gray-800 hover:text-blue-600">Highlight</a>
             <a href="#software" className="text-gray-800 hover:text-blue-600">Software</a>
             <a href="#games" className="text-gray-800 hover:text-blue-600">Games</a>
@@ -84,17 +118,12 @@ export default function Home() {
       </header>
 
       {/* Intro Section */}
-      <section id="intro" className="pt-20 text-white py-20 text-center cursor-pointer min-h-screen flex items-center justify-center"
-        style={{ backgroundImage: `url('/imgs/logo.png')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-        onClick={() => document.getElementById('intro')?.scrollIntoView({ behavior: 'smooth' })}>
-        <div className="container mx-auto px-6">
-          <h1 className="text-4xl font-bold mb-4" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>Welcome to Dream Crown</h1>
-          <p className="text-xl" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
-            Hello, my name is Allen Lee. The name "Dream Crown" is a name I came up with in junior high school,
-            and I kept it to mark where my my dream started. This platform is a testament to that journey.
-          </p>
-        </div>
+      <section id="intro" className="relative overflow-hidden pt-20 text-white py-20 text-center cursor-pointer min-h-screen flex items-center justify-center"
+        style={{ backgroundImage: `url('/imgs/logo.png')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-[30deg] animate-shimmer"></div>
       </section>
+
+      <IntroSection />
 
       {/* Highlight Section */}
       <section id="highlight" className="py-16 container mx-auto px-6">
@@ -176,6 +205,17 @@ export default function Home() {
           category={selectedCard.category}
         />
       )}
+
+      {/* Scroll Down Button - Fixed Layer */}
+      <a 
+        href="#about-me" 
+        onClick={handleScrollButtonClick}
+        className={`fixed bottom-10 right-10 animate-bounce bg-white/30 backdrop-blur-sm p-2 rounded-full text-white hover:bg-white/50 transition-opacity duration-500 z-20 ${isScrollButtonVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        aria-label="Scroll down">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-8 h-8">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </a>
     </div>
   );
 }
