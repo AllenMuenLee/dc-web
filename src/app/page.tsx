@@ -101,7 +101,6 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-gray-800 text-center mb-10">Highlight</h2>
         <div className="flex flex-wrap justify-center">
           {highlightCards.map((card) => (
-            <div key={card.id} className="w-full lg:w-3/4 xl:w-2/3 mb-8 mx-auto">
               <Card
                 title={card.title}
                 description={card.description}
@@ -112,7 +111,6 @@ export default function Home() {
                 videoLink={card.videoLink}
                 onClick={() => openModal(card)}
               />
-            </div>
           ))}
         </div>
       </section>
